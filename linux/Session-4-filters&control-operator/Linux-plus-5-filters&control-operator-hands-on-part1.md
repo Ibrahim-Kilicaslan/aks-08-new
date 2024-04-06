@@ -217,14 +217,14 @@ wc -l /etc/passwd
 ​
 ```bash
 cat << EOF > marks.txt
-aeron-9
-albert-9
-james-9
 john-10
+victor-10
+james-9
+walter-8
+aeron-9
 oliver-7
 tom-7
-victor-10
-walter-8
+albert-9
 EOF
 ```
 
