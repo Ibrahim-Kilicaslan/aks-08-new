@@ -26,12 +26,14 @@ At the end of the this hands-on training, students will be able to;
 
 - Part 4 - Deploying a Simple Nginx Server on Kubernetes
 
+- Part 5 - Deploying a Simple Nginx Server on Kubernetes
+
 
 ## Part 1 - Setting Up Kubernetes Environment on All Nodes
 
-- In this hands-on, we will prepare two nodes for Kubernetes on `Ubuntu 22.04`. One of the node will be configured as the Master node, the other will be the worker node. Following steps should be executed on all nodes. *Note: It is recommended to install Kubernetes on machines with `2 CPU Core` and `2GB RAM` at minimum to get it working efficiently. For this reason, we will select `t2.medium` as EC2 instance type, which has `2 CPU Core` and `4 GB RAM`.*
+- In this hands-on, we will prepare two nodes for Kubernetes on `Ubuntu 24.04`. One of the node will be configured as the Master node, the other will be the worker node. Following steps should be executed on all nodes. *Note: It is recommended to install Kubernetes on machines with `2 CPU Core` and `2GB RAM` at minimum to get it working efficiently. For this reason, we will select `t2.medium` as EC2 instance type, which has `2 CPU Core` and `4 GB RAM`.*
 
-- Explain briefly [required ports](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)  for Kubernetes. 
+- Explain briefly [required ports](https://kubernetes.io/docs/reference/networking/ports-and-protocols/)  for Kubernetes. 
 
 - Create two security groups. Name the first security group as master-sec-group and apply the following Control-plane (Master) Node(s) table to your master node.
 
@@ -54,6 +56,7 @@ At the end of the this hands-on training, students will be able to;
 |Protocol|Direction|Port Range|Purpose|Used By|
 |---|---|---|---|---|
 |TCP|Inbound|10250|Kubelet API|Self, Control plane|
+|TCP|Inbound|10256|kube-proxy|Self, Load balancers|
 |TCP|Inbound|30000-32767|NodePort Services|All|
 |TCP|Inbound|22|remote access with ssh|Self|
 |UDP|Inbound|8472|Cluster-Wide Network Comm. - Flannel VXLAN|Self|
@@ -162,6 +165,7 @@ sudo systemctl status containerd
 ```bah
 sudo ctr images pull docker.io/library/redis:alpine
 sudo ctr run -d docker.io/library/redis:alpine redis
+sudo ctr container ls
 ```
 
 #### Install nerdctl (Optional)
@@ -173,19 +177,20 @@ sudo ctr run -d docker.io/library/redis:alpine redis
 - Download `nerdctl-full-*-linux-amd64.tar.gz` release.
 
 ```curl
-wget https://github.com/containerd/nerdctl/releases/download/v1.7.2/nerdctl-full-1.7.2-linux-amd64.tar.gz
+wget https://github.com/containerd/nerdctl/releases/download/v1.7.6/nerdctl-full-1.7.6-linux-amd64.tar.gz
 ```
 
 - Extract the archive to a path like `/usr/local`.
 
 ```bash
-sudo tar xvf nerdctl-full-1.7.2-linux-amd64.tar.gz -C /usr/local
+sudo tar xvf nerdctl-full-1.7.6-linux-amd64.tar.gz -C /usr/local
 ```
 
 - Test the `nerdctl`.
 
 ```bash
 sudo nerdctl run -d --name redis redis:alpine
+sudo nerdctl container ls
 ```
 
 #### cgroup drivers (https://kubernetes.io/docs/setup/production-environment/container-runtimes/)
@@ -227,11 +232,11 @@ sudo apt-get install -y apt-transport-https ca-certificates curl gpg
 
 # Download the Google Cloud public signing key:
 
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # Add the Kubernetes apt repository:
 
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 ```
 
 - Update apt package index, install kubelet, kubeadm and kubectl, and pin their version:
@@ -353,6 +358,12 @@ kubectl get services
 kubectl get nodes
 ```
 
+- Get the kubeadm `join command` on `master node`.
+
+```bash
+kubeadm token create --print-join-command
+```
+
 - Run `sudo kubeadm join...` command to have them join the cluster on `worker node`.
 
 ```bash
@@ -438,16 +449,18 @@ kubectl delete pods nginx-server
 kubectl get pods
 ```
 
-- To delete a worker/slave node from the cluster, follow the below steps.
+### Delete a worker node from Cluster
+
+- To delete a worker node from the cluster, follow the below steps.
 
   - Drain and delete worker node on the master.
 
   ```bash
   kubectl get nodes
-  kubectl cordon kube-worker-1
-  kubectl drain kube-worker-1 --ignore-daemonsets --delete-emptydir-data
+  kubectl cordon kube-worker
+  kubectl drain kube-worker --ignore-daemonsets --delete-emptydir-data
 
-  kubectl delete node kube-worker-1
+  kubectl delete node kube-worker
   ```
 
   - Remove and reset settings on the worker node.

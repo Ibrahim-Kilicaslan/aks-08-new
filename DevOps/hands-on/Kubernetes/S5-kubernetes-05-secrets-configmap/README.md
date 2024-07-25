@@ -385,8 +385,8 @@ Let's see the message.
 
 ```bash
 kubectl get svc demo-service -o wide
-NAME           TYPE           CLUSTER-IP    EXTERNAL-IP   PORT(S)        AGE     SELECTOR
-demo-service   LoadBalancer   10.97.39.39   <pending>     80:30001/TCP   2m20s   app=demo
+NAME           TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE   SELECTOR
+demo-service   NodePort   10.109.195.236   <none>        80:30001/TCP   17s   app=demo
 
 curl < worker-ip >:30001
 Hello, Clarusway!

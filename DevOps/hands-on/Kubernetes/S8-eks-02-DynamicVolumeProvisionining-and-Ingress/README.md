@@ -116,7 +116,7 @@ aws configure
 - Create an EKS cluster via `eksctl`. It will take a while.
 
 ```bash
-eksctl create cluster --region us-east-1 --version 1.29 --zones us-east-1a,us-east-1b,us-east-1c --node-type t3a.medium --nodes 2 --nodes-min 2 --nodes-max 3 --name cw-cluster
+eksctl create cluster --region us-east-1 --version 1.30 --zones us-east-1a,us-east-1b,us-east-1c --node-type t3a.medium --nodes 2 --nodes-min 2 --nodes-max 3 --name cw-cluster
 ```
 
 ### Alternative way (Including ssh connect to worker node)
@@ -682,20 +682,19 @@ kubectl apply -f pod-with-dynamic-storage.yaml
 kubectl exec -it test-aws -- bash
 ```
 - You will see an output like this
-```text
+
+```bash
 root@test-aws:/# df -h
 Filesystem      Size  Used Avail Use% Mounted on
-overlay          80G  3.5G   77G   5% /
+overlay          80G  3.7G   77G   5% /
 tmpfs            64M     0   64M   0% /dev
-tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
-/dev/xvda1       80G  3.5G   77G   5% /etc/hosts
+tmpfs           1.9G     0  1.9G   0% /sys/fs/cgroup
+/dev/nvme0n1p1   80G  3.7G   77G   5% /etc/hosts
 shm              64M     0   64M   0% /dev/shm
-/dev/xvdcj      2.9G  9.1M  2.9G   1% /usr/share/nginx/html
-tmpfs           2.0G   12K  2.0G   1% /run/secrets/kubernetes.io/serviceaccount
-tmpfs           2.0G     0  2.0G   0% /proc/acpi
-tmpfs           2.0G     0  2.0G   0% /proc/scsi
-tmpfs           2.0G     0  2.0G   0% /sys/firmware
-root@test-aws:/#
+/dev/nvme1n1    974M   24K  958M   1% /usr/share/nginx/html
+tmpfs           3.3G   12K  3.3G   1% /run/secrets/kubernetes.io/serviceaccount
+tmpfs           1.9G     0  1.9G   0% /proc/acpi
+tmpfs           1.9G     0  1.9G   0% /sys/firmware
 ```
 
 - Delete the storageclass that we create.

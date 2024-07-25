@@ -311,7 +311,7 @@ spec:
     spec:
       containers:
       - name: php-apache
-        image: k8s.gcr.io/hpa-example
+        image: registry.k8s.io/hpa-example
         ports:
         - containerPort: 80
         resources:
@@ -412,8 +412,8 @@ web-service          NodePort    10.107.136.54   <none>        3000:30634/TCP   
 - Add `watch` board to verify the latest status of Cluster by below Commands.(This is Optional as not impacting the Functionality of Cluster). Observe in a separate terminal.
 
 ```bash
-$ kubectl get service,hpa,pod -o wide
-$ watch -n1 !!
+kubectl get service,hpa,pod -o wide
+watch -n1 !!
 ```
 
 ### Create Horizontal Pod Autoscaler   
@@ -483,11 +483,12 @@ EOF
 ```
 
 ```bash
-$ kubectl apply -f hpa-php-apache.yaml
-$ kubectl apply -f hpa-web.yaml
+kubectl apply -f hpa-php-apache.yaml
+kubectl apply -f hpa-web.yaml
 ```
 
 Let's look at the status:
+
 ```bash
 $ watch -n3 kubectl get service,hpa,pod -o wide 
 
@@ -556,13 +557,13 @@ Conditions:
 - First Delete the existing Metric Server if any.
 
 ```bash
-$ kubectl delete -n kube-system deployments.apps metrics-server
+kubectl delete -n kube-system deployments.apps metrics-server
 ```
 
-- Get the Metric Server form [GitHub](https://github.com/kubernetes-sigs/metrics-server/releases/tag/v0.6.3).
+- Get the Metric Server form [GitHub](https://github.com/kubernetes-sigs/metrics-server/releases/tag/v0.7.1).
 
 ```bash
-$ wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+wget https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
 
 - Edit the file `components.yaml`. You will select the `Deployment` part in the file. Add the below line to `containers.args field under the deployment object`.
@@ -590,14 +591,14 @@ kind: Deployment
 - Add `metrics-server` to your Kubernetes instance.
 
 ```bash
-$ kubectl apply -f components.yaml
+kubectl apply -f components.yaml
 ```
 - Wait 1-2 minute or so.
 
 - Verify the existace of `metrics-server` run by below command
 
 ```bash
-$ kubectl -n kube-system get pods
+kubectl -n kube-system get pods
 ```
 
 - Verify `metrics-server` can access resources of the pods and nodes.

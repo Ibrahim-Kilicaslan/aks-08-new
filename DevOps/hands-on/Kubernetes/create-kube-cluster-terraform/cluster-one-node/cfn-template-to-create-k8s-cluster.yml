@@ -34,7 +34,7 @@ Resources:
   KubeMaster1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-080e1f13689e07408
+      ImageId: ami-0a0e5d9c7acc336f1
       InstanceType: t3a.medium
       KeyName: !Ref KeyPairName
       SecurityGroupIds:

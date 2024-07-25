@@ -1,5 +1,5 @@
-a# Hands-on EC2-05 : Working with EC2 Snapshots
-                                                                                                                                                                                                                                                                                                                  4q  
+# Hands-on EC2-05 : Working with EC2 Snapshots
+
 Purpose of the this hands-on training is to teach students how to take a snapshot of EC2 instance, create an image from EC2 instance and using Data Lifecycle Manager. 
 
 ## Learning Outcomes
@@ -172,7 +172,7 @@ Description : ClaruswayAMI_3
 
 ## Part 5 - Hosting WordPress on EC2 with AMI
 
-- Create EC2 instnace 
+- Create EC2 instnace
   - AMI: AWS Marketplace  : "WordPress Certified by Bitnami and Automattic" (Free tier)       
                             (ami-04e81d256e77d2116)
   - Instance type         : t2.micro

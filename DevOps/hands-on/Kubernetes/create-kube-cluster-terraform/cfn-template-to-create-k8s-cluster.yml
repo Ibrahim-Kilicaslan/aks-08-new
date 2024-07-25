@@ -32,6 +32,7 @@ Resources:
           - Effect: Allow
             Action:
               - ec2:DescribeInstances
+              - ec2:DescribeInstanceStatus
             Resource: "*"
   
   EC2InstanceConnect:
@@ -106,7 +107,7 @@ Resources:
   KubeMaster1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-080e1f13689e07408
+      ImageId: ami-0a0e5d9c7acc336f1
       InstanceType: t3a.medium
       KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref EC2ConnectProfile
@@ -158,7 +159,7 @@ Resources:
     DependsOn:
       - KubeMaster1
     Properties:
-      ImageId: ami-080e1f13689e07408
+      ImageId: ami-0a0e5d9c7acc336f1
       InstanceType: t3a.medium
       KeyName: !Ref KeyPairName
       IamInstanceProfile: !Ref EC2ConnectProfile
@@ -175,7 +176,7 @@ Resources:
             apt-get update -y
             apt-get upgrade -y
             hostnamectl set-hostname kube-worker
-            sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+            sudo apt-get install -y apt-transport-https ca-certificates curl gpg unzip
             curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
             echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
             apt-get update
@@ -196,13 +197,14 @@ Resources:
             sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
             systemctl restart containerd
             systemctl enable containerd
-            wget https://bootstrap.pypa.io/get-pip.py
-            python3 get-pip.py
-            pip install pyopenssl --upgrade
-            pip3 install ec2instanceconnectcli
-            apt install -y mssh
-            until [[ $(mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t ${KubeMaster1} -r ${AWS::Region} ubuntu@${KubeMaster1} kubectl get no | awk 'NR == 2 {print $2}') == Ready ]]; do echo "master node is not ready"; sleep 3; done;
-            kubeadm join ${KubeMaster1.PrivateIp}:6443 --token $(mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t ${KubeMaster1} -r ${AWS::Region} ubuntu@${KubeMaster1} kubeadm token list | awk 'NR == 2 {print $1}') --discovery-token-ca-cert-hash sha256:$(mssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -t ${KubeMaster1} -r ${AWS::Region} ubuntu@${KubeMaster1} openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //') --ignore-preflight-errors=All
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+            aws ec2 wait instance-status-ok --instance-ids ${KubeMaster1}
+            ssh-keygen -t rsa -f /home/ubuntu/kube_key -q -N ""
+            aws ec2-instance-connect send-ssh-public-key --region ${AWS::Region} --availability-zone $(aws ec2 describe-instances --instance-ids ${KubeMaster1} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text) --instance-id ${KubeMaster1} --instance-os-user ubuntu --ssh-public-key file:///home/ubuntu/kube_key.pub \
+            && eval "$(ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  \
+            -i /home/ubuntu/kube_key ubuntu@$(aws ec2 describe-instances --instance-ids ${KubeMaster1} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text) kubeadm token create --print-join-command)"
 
 Outputs:
   1stKubeMasterPublicDNSName:

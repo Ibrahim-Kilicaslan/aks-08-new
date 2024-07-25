@@ -17,10 +17,10 @@ data "aws_region" "current" {}
 
 locals {
   # change here, optional
-  name = "clarusway"
-  keyname = "clarus"
+  name = "clarus"
+  keyname = "clarusway"
   instancetype = "t3a.medium"
-  ami = "ami-080e1f13689e07408"
+  ami = "ami-0a0e5d9c7acc336f1"
 }
 
 resource "aws_instance" "master" {
@@ -31,7 +31,7 @@ resource "aws_instance" "master" {
   user_data            = file("master.sh")
   vpc_security_group_ids = [aws_security_group.tf-k8s-master-sec-gr.id]
   tags = {
-    Name = "${local.name}-kube-master"
+    Name = "kube-master"
   }
 }
 
@@ -41,9 +41,9 @@ resource "aws_instance" "worker" {
   key_name             = local.keyname
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
   vpc_security_group_ids = [aws_security_group.tf-k8s-master-sec-gr.id]
-  user_data            = templatefile("worker.sh", { region = data.aws_region.current.name, master-id = aws_instance.master.id, master-private = aws_instance.master.private_ip} )
+  user_data            = templatefile("worker.sh", { region = data.aws_region.current.name, master-id = aws_instance.master.id, master-zone =  aws_instance.master.availability_zone, master-private = aws_instance.master.private_ip} )
   tags = {
-    Name = "${local.name}-kube-worker"
+    Name = "kube-worker"
   }
   depends_on = [aws_instance.master]
 }
@@ -87,7 +87,10 @@ resource "aws_iam_role" "ec2connectcli" {
         },
         {
           "Effect" : "Allow",
-          "Action" : "ec2:DescribeInstances",
+          "Action" : [
+            "ec2:DescribeInstances",
+            "ec2:DescribeInstanceStatus"
+          ],
           "Resource" : "*"
         }
       ]

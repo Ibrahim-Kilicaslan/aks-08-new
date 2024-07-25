@@ -108,12 +108,6 @@ spec:
   selector:  
     matchLabels:
       app: web-flask
-  minReadySeconds: 10 
-  strategy:
-    type: RollingUpdate 
-    rollingUpdate:
-      maxUnavailable: 1 
-      maxSurge: 1 
   template: 
     metadata:
       labels:
@@ -428,12 +422,6 @@ spec:
   selector:
     matchLabels:
       app: web-flask
-  minReadySeconds: 10
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
   template:
     metadata:
       labels:

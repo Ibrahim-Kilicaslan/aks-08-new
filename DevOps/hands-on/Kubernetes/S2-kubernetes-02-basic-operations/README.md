@@ -18,9 +18,10 @@ At the end of the this hands-on training, students will be able to;
 
 - Part 2 - Basic Operations in Kubernetes
 
-- Part 3 - Deployment Rolling Update and Rollback in Kubernetes
+- Part 3 - Namespaces in Kubernetes
 
-- Part 4 - Namespaces in Kubernetes
+- Part 4 - Deployment Rolling Update and Rollback in Kubernetes
+
 
 ## Part 1 - Setting up the Kubernetes Cluster
 
@@ -190,13 +191,13 @@ kubectl get pods -o wide
 - Show details of replicasets.
 
 ```bash
-kubectl describe replicaset <replicaset-name>
+kubectl describe replicaset nginx-rs
 ```
 
 - Delete replicasets
 
 ```bash
-kubectl delete replicaset <replicaset-name>
+kubectl delete replicaset nginx-rs
 ```
 
 #### Pod Selector
@@ -226,7 +227,7 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx
+      app: nginx  
   template:
     metadata:
       labels:
@@ -323,10 +324,87 @@ kubectl get pods
 - Delete deployments
 
 ```bash
-kubectl delete deploy <deployment-name>
+kubectl delete deploy nginx-deployment
 ```
 
-## Part 3 - Deployment Rolling Update and Rollback in Kubernetes
+## Part 3 - Namespaces in Kubernetes
+
+- List the current namespaces in a cluster using and explain them. *Kubernetes supports multiple virtual clusters backed by the same physical cluster. These virtual clusters are called `namespaces`.*
+
+```bash
+kubectl get namespace
+NAME              STATUS   AGE
+default           Active   118m
+kube-node-lease   Active   118m
+kube-public       Active   118m
+kube-system       Active   118m
+```
+
+>### default
+>Kubernetes includes this namespace so that you can start using your new cluster without first creating a namespace.
+
+>### kube-system
+>The namespace for objects created by the Kubernetes system.
+
+>### kube-public
+>This namespace is readable by all clients (including those not authenticated). This namespace is mostly reserved for cluster usage, in case that some resources should be visible and readable publicly throughout the whole cluster. The public aspect of this namespace is only a convention, not a requirement.
+
+>### kube-node-lease
+>This namespace holds Lease objects associated with each node. Node leases allow the kubelet to send heartbeats so that the control plane can detect node failure.
+
+- Create a new YAML file called `my-namespace.yaml` with the following content.
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mynamespace
+```
+
+- Create a namespace using the `my-namespace.yaml` file.
+
+```bash
+kubectl apply -f ./my-namespace.yaml
+```
+
+- Alternatively, you can create namespace using below command:
+
+```bash
+kubectl create namespace <namespace-name>
+```
+
+- Create pods in each namespace.
+
+```bash
+kubectl create deployment mynginx --image=nginx
+kubectl create deployment myapache --image=httpd -n=mynamespace
+```
+
+- List the deployments in `default` namespace.
+
+```bash
+kubectl get deployment
+```
+
+- List the deployments in `mynamespace`.
+
+```bash
+kubectl get deployment -n mynamespace
+```
+
+- List the all deployments.
+
+```bash
+kubectl get deployment -o wide --all-namespaces
+```
+
+- Delete the namespace.
+
+```bash
+kubectl delete namespaces mynamespace
+```
+
+## Part 4 - Deployment Rolling Update and Rollback in Kubernetes
 
 - Create a new folder name it deployment-lesson.
 
@@ -351,6 +429,12 @@ spec:
   selector:
     matchLabels:
       app: myapp
+  minReadySeconds: 10 
+  strategy:
+    type: RollingUpdate 
+    rollingUpdate:
+      maxUnavailable: 1 
+      maxSurge: 1  
   template:
     metadata:
       labels:
@@ -511,79 +595,3 @@ kubectl get deploy,rs,po -l app=myapp
 kubectl delete deploy -l app=myapp
 ```
 
-## Part 4 - Namespaces in Kubernetes
-
-- List the current namespaces in a cluster using and explain them. *Kubernetes supports multiple virtual clusters backed by the same physical cluster. These virtual clusters are called `namespaces`.*
-
-```bash
-kubectl get namespace
-NAME              STATUS   AGE
-default           Active   118m
-kube-node-lease   Active   118m
-kube-public       Active   118m
-kube-system       Active   118m
-```
-
->### default
->Kubernetes includes this namespace so that you can start using your new cluster without first creating a namespace.
-
->### kube-system
->The namespace for objects created by the Kubernetes system.
-
->### kube-public
->This namespace is readable by all clients (including those not authenticated). This namespace is mostly reserved for cluster usage, in case that some resources should be visible and readable publicly throughout the whole cluster. The public aspect of this namespace is only a convention, not a requirement.
-
->### kube-node-lease
->This namespace holds Lease objects associated with each node. Node leases allow the kubelet to send heartbeats so that the control plane can detect node failure.
-
-- Create a new YAML file called `my-namespace.yaml` with the following content.
-
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mynamespace
-```
-
-- Create a namespace using the `my-namespace.yaml` file.
-
-```bash
-kubectl apply -f ./my-namespace.yaml
-```
-
-- Alternatively, you can create namespace using below command:
-
-```bash
-kubectl create namespace <namespace-name>
-```
-
-- Create pods in each namespace.
-
-```bash
-kubectl create deployment mynginx --image=nginx
-kubectl create deployment myapache --image=httpd -n=mynamespace
-```
-
-- List the deployments in `default` namespace.
-
-```bash
-kubectl get deployment
-```
-
-- List the deployments in `mynamespace`.
-
-```bash
-kubectl get deployment -n mynamespace
-```
-
-- List the all deployments.
-
-```bash
-kubectl get deployment -o wide --all-namespaces
-```
-
-- Delete the namespace.
-
-```bash
-kubectl delete namespaces mynamespace
-```
