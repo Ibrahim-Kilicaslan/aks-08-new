@@ -1,0 +1,9 @@
+//aws_access_key = ""
+//aws_secret_key = ""
+mykey = "keypair"
+tags = ["control_node", "node_1", "node_2", "node_3"]
+instancetype = "t2.micro"
+num = 4
+region = "us-east-1"
+amznlnx = "ami-07caf09b362be10b8"
+ubuntu = "ami-04b70fa74e45c3917"

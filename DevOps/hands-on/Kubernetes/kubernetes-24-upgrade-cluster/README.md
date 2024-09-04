@@ -25,7 +25,7 @@ At the end of the this hands-on training, students will be able to;
 
 ```bash
 kubectl cluster-info
-kubectl get node
+kubectl get no
 ```
 
 ## Part 2 - Upgrade A Cluster
@@ -59,7 +59,7 @@ kubectl get node
 
 - At this point you should install the latest version of kubectl.
 
-- For each node in your cluster, drain that node and then either replace it with a new node that uses the 1.29 kubelet, or upgrade the kubelet on that node and bring the node back into service.
+- For each node in your cluster, drain that node and then either replace it with a new node that uses the 1.30 kubelet, or upgrade the kubelet on that node and bring the node back into service.
 
 ### Upgrading kubeadm cluster
 
@@ -72,9 +72,9 @@ kubectl version
 - You will get an output like this.
 
 ```bash
-Client Version: v1.28.5
+Client Version: v1.29.0
 Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
-Server Version: v1.28.5
+Server Version: v1.29.6
 ```
 
 #### Switching to another Kubernetes package repository
@@ -89,13 +89,13 @@ sudo vi /etc/apt/sources.list.d/kubernetes.list
 * You should see a single line with the URL that contains your current Kubernetes minor version. For example, if you're using v1.28, you should see this:
 
 ```bash
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
 ```
 
 - Change the version in the URL to the next available minor release, for example:
 
 ```bash
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
 ```
 
 - Save the file and exit your text editor. 
@@ -105,8 +105,8 @@ deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io
 - Find the latest patch release for Kubernetes 1.29 using the OS package manager.
 
 ```bash
-# Find the latest 1.29 version in the list.
-# It should look like 1.29.x-*, where x is the latest patch.
+# Find the latest 1.30 version in the list.
+# It should look like 1.30.x-*, where x is the latest patch.
 sudo apt update
 apt-cache madison kubeadm
 ```
@@ -118,9 +118,9 @@ apt-cache madison kubeadm
 - Upgrade kubeadm:
 
 ```bash
-# replace x in 1.29.0-1.1 with the latest patch version
+# replace x in 1.30.x-* with the latest patch version
 sudo apt-mark unhold kubeadm && \
-sudo apt-get update && sudo apt-get install -y kubeadm='1.29.0-1.1' && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.x-*' && \
 sudo apt-mark hold kubeadm
 ```
 
@@ -139,35 +139,34 @@ sudo kubeadm upgrade plan
 - You will get an output like below.
 
 ```bash
-[upgrade/config] Making sure the configuration is correct:
+[preflight] Running pre-flight checks.
 [upgrade/config] Reading configuration from the cluster...
 [upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -o yaml'
-[preflight] Running pre-flight checks.
 [upgrade] Running cluster health checks
 [upgrade] Fetching available versions to upgrade to
-[upgrade/versions] Cluster version: v1.28.5
-[upgrade/versions] kubeadm version: v1.29.0
-[upgrade/versions] Target version: v1.29.0
-[upgrade/versions] Latest version in the v1.28 series: v1.28.5
+[upgrade/versions] Cluster version: 1.29.6
+[upgrade/versions] kubeadm version: v1.30.2
+[upgrade/versions] Target version: v1.30.2
+[upgrade/versions] Latest version in the v1.29 series: v1.29.6
 
 Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
-COMPONENT   CURRENT       TARGET
-kubelet     1 x v1.28.5   v1.29.0
-            1 x v1.29.0   v1.29.0
+COMPONENT   NODE          CURRENT   TARGET
+kubelet     kube-master   v1.29.0   v1.30.2
+kubelet     kube-worker   v1.29.0   v1.30.2
 
 Upgrade to the latest stable version:
 
-COMPONENT                 CURRENT   TARGET
-kube-apiserver            v1.28.5   v1.29.0
-kube-controller-manager   v1.28.5   v1.29.0
-kube-scheduler            v1.28.5   v1.29.0
-kube-proxy                v1.28.5   v1.29.0
-CoreDNS                   v1.10.1   v1.11.1
-etcd                      3.5.9-0   3.5.10-0
+COMPONENT                 NODE          CURRENT    TARGET
+kube-apiserver            kube-master   v1.29.6    v1.30.2
+kube-controller-manager   kube-master   v1.29.6    v1.30.2
+kube-scheduler            kube-master   v1.29.6    v1.30.2
+kube-proxy                              1.29.6     v1.30.2
+CoreDNS                                 v1.11.1    v1.11.1
+etcd                      kube-master   3.5.10-0   3.5.12-0
 
 You can now apply the upgrade by executing the following command:
 
-        kubeadm upgrade apply v1.29.0
+        kubeadm upgrade apply v1.30.2
 
 ***
 ```
@@ -177,13 +176,13 @@ You can now apply the upgrade by executing the following command:
 - Choose a version to upgrade to, and run the appropriate command. For example:
 
 ```bash
-sudo kubeadm upgrade apply v1.29.0
+sudo kubeadm upgrade apply v1.30.2
 ```
 
 - Once the command finishes you should see:
 
 ```bash
-[upgrade/successful] SUCCESS! Your cluster was upgraded to "v1.29.0". Enjoy!
+[upgrade/successful] SUCCESS! Your cluster was upgraded to "v1.30.2". Enjoy!
 
 [upgrade/kubelet] Now that your control plane is upgraded, please proceed with upgrading your kubelets if you haven't already done so.
 ```
@@ -218,9 +217,10 @@ kubectl drain kube-master --ignore-daemonsets
 - Upgrade the kubelet and kubectl:
 
 ```bash
-# replace x in 1.29.0-1.1* with the latest patch version
+apt-cache madison kubelet
+# replace x in 1.30.x-* with the latest patch version
 sudo apt-mark unhold kubelet kubectl && \
-sudo apt-get update && sudo apt-get install -y kubelet='1.29.0-1.1' kubectl='1.29.0-1.1' && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.x-*' kubectl='1.30.x-*' && \
 sudo apt-mark hold kubelet kubectl
 ```
 
@@ -264,13 +264,13 @@ sudo vi /etc/apt/sources.list.d/kubernetes.list
 * You should see a single line with the URL that contains your current Kubernetes minor version. For example, if you're using v1.28, you should see this:
 
 ```bash
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
 ```
 
 - Change the version in the URL to the next available minor release, for example:
 
 ```bash
-deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /
+deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /
 ```
 
 - Save the file and exit your text editor. 
@@ -278,9 +278,11 @@ deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io
 - Upgrade kubeadm:
 
 ```bash
-# replace x in 1.29.0-1.1 with the latest patch version
+sudo apt update
+apt-cache madison kubeadm
+# replace x in 1.30.x-* with the latest patch version
 sudo apt-mark unhold kubeadm && \
-sudo apt-get update && sudo apt-get install -y kubeadm='1.29.0-1.1' && \
+sudo apt-get update && sudo apt-get install -y kubeadm='1.30.x-*' && \
 sudo apt-mark hold kubeadm
 ```
 
@@ -305,9 +307,10 @@ kubectl drain kube-worker --ignore-daemonsets
 - Upgrade kubelet and kubectl
 
 ```bash
-# replace x in 1.29.0-1.1* with the latest patch version
+apt-cache madison kubelet
+# replace x in 1.30.x-* with the latest patch version
 sudo apt-mark unhold kubelet kubectl && \
-sudo apt-get update && sudo apt-get install -y kubelet='1.29.0-1.1' kubectl='1.29.0-1.1' && \
+sudo apt-get update && sudo apt-get install -y kubelet='1.30.x-*' kubectl='1.30.x-*' && \
 sudo apt-mark hold kubelet kubectl
 ```
 
