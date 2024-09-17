@@ -1,0 +1,187 @@
+- name: Docker install and configuration
+  hosts: _development
+  become: true
+  tasks:
+    - name: upgrade all packages
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+
+    - name: Remove docker if installed from CentOS repo
+      ansible.builtin.yum:
+        name:
+          - docker
+          - docker-client
+          - docker-client-latest
+          - docker-common
+          - docker-latest
+          - docker-latest-logrotate
+          - docker-logrotate
+          - docker-engine
+        state: removed
+
+    - name: Install yum utils
+      ansible.builtin.yum:
+        name: 'yum-utils'
+        state: present
+
+    - name: Add Docker repo
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/
+
+    - name: Install Docker
+      ansible.builtin.yum:
+        name: 'docker-ce'
+        state: latest
+
+    - name: Add user ec2-user to docker group
+      ansible.builtin.user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+- name: Postgre Database configuration
+  hosts: _ansible_postgresql
+  become: true
+  vars:
+    image_name: todo_postgre
+    container_name: todo_database
+    container_path: /home/ec2-user/postgresql
+  tasks:
+    - name: copy files to the postgresql node
+      ansible.builtin.copy:
+        src: /home/ec2-user/ansible/ansible-project/postgres/
+        dest: "{{ container_path }}"
+
+    - name: remove  {{ container_name }} container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: remove {{ image_name }} image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        state: absent
+
+    - name: build container image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        build:
+          path: "{{ container_path }}"
+        source: build
+        state: present
+
+    - name: Launch postgresql docker container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        ports:
+        - "5432:5432"
+        env:
+          POSTGRES_PASSWORD: Pp123456789
+        volumes:
+          - /db-data:/var/lib/postgresql/data
+      register: container_info
+
+    - name: print the container info
+      ansible.builtin.debug:
+        var: container_info.container.State.Status
+
+- name: Nodejs Backend configuration
+  hosts: _ansible_nodejs
+  become: true
+  vars:
+    image_name: todo_nodejs
+    container_name: todo_backend
+    container_path: /home/ec2-user/nodejs
+  tasks:
+    - name: copy files to the nodejs node
+      ansible.builtin.copy:
+        src: /home/ec2-user/ansible/ansible-project/nodejs/
+        dest: "{{ container_path }}"
+
+    - name: remove  {{ container_name }} container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: remove {{ image_name }} image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        state: absent
+
+    - name: build container image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        build:
+          path: "{{ container_path }}"
+        source: build
+        state: present
+
+    - name: Launch {{ container_name }} docker container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        ports:
+        - "5000:5000"
+      register: container_info
+
+    - name: print the container info
+      ansible.builtin.debug:
+        var: container_info.container.State.Status
+
+- name: React Frontend configuration
+  hosts: _ansible_react
+  become: true
+  vars:
+    image_name: todo_react
+    container_name: todo_frontend
+    container_path: /home/ec2-user/react
+  tasks:
+    - name: copy files to the react node
+      ansible.builtin.copy:
+        src: /home/ec2-user/ansible/ansible-project/react/
+        dest: "{{ container_path }}"
+
+    - name: remove  {{ container_name }} container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        state: absent
+        force_kill: true
+
+    - name: remove {{ image_name }} image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        state: absent
+
+    - name: build container image
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        build:
+          path: "{{ container_path }}"
+        source: build
+        state: present
+
+    - name: Launch {{ container_name }} docker container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        ports:
+        - "3000:3000"
+      register: container_info
+
+    - name: print the container info
+      ansible.builtin.debug:
+        var: container_info.container.State.Status

@@ -279,8 +279,6 @@ sudo usermod -a -G docker ec2-user
 sudo usermod -a -G docker jenkins
 newgrp docker
 # configure docker as cloud agent for jenkins
-sudo cp /lib/systemd/system/docker.service /lib/systemd/system/docker.service.bak
-sudo sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 -H unix:\/\/\/var\/run\/docker.sock/g' /lib/systemd/system/docker.service
 sudo systemctl daemon-reload
 sudo systemctl restart jenkins
 ```

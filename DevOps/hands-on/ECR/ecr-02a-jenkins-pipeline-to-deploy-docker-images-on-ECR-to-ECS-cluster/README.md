@@ -57,9 +57,9 @@ At the end of the this hands-on training, students will be able to;
 ```text
 Visibility settings     : Private
 Repository name         :  <your account ID>.dkr.ecr.us-east-1.amazonaws.com/clarusway/to-do-app
-Tag immutability        : Disable
-Image scan settings     : Disable
-Encryption settings     : Disable
+Image tag mutability    : Mutable
+Encryption settings     : AES-256
+Image scan settings     : Scan on push (Disable)
 ```
 
 ### Step-2: Create Webhook 
@@ -148,9 +148,18 @@ pipeline {
 
 - explain withEnv(["HOME=${env.WORKSPACE}"]) the meaning of this line
 
+- Commit and push the local changes to update the remote repo on GitHub.
+
+```bash
+git add .
+git commit -m 'added Jenkinsfile'
+git push
+```
+
+
 - once we see the code is running, lets build its image. to do this, we should write Dockerfile based and configure the Jenkinsfile
 
-- Go under todo-app-node-project/ folder and then create a Docker file via `vi` editor.
+- Go under todo-app-node-project/ folder and then create a Dockerfile via `vi` editor.
 
 ```bash
 cd todo-app-node-project/

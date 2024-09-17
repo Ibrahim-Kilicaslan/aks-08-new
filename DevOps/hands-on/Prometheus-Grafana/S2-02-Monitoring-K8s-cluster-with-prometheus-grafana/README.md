@@ -19,7 +19,7 @@ At the end of this hands-on training, students will be able to;
 
 ## Part 1 - Launching a Kubernetes cluster
 
-- Launch a Kubernetes Cluster of Ubuntu 22.04 with two nodes (one master, one worker) using the [Cloudformation Template to Create Kubernetes Cluster](./cfn-template-to-create-k8s-cluster.yml). *Note: Once the master node up and running, worker node automatically joins the cluster.*
+- Launch a Kubernetes Cluster of Ubuntu 22.04 with two nodes (one master, one worker) using the [Cloudformation Template to Create Kubernetes Cluster](../../Kubernetes/create-kube-cluster-terraform/cfn-template-to-create-k8s-cluster.yml). *Note: Once the master node up and running, worker node automatically joins the cluster.*
 
 - Check if Kubernetes is running.
 
@@ -119,7 +119,7 @@ kubectl edit svc grafana
 kubectl get secret grafana -o yaml
 ```
 
-- Decode the `admin-password` and `admin-user` as below. Don
+- Decode the `admin-password` and `admin-user` as below.
 
 ```bash
 echo "YWRtaW4=" | base64 -d ; echo

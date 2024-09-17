@@ -36,7 +36,7 @@ unzip awscliv2.zip
 # Join the worker node
 aws ec2 wait instance-status-ok --instance-ids ${master-id}
 ssh-keygen -t rsa -f /home/ubuntu/kube_key -q -N ""
-sleep 1
+sleep 60
 aws ec2-instance-connect send-ssh-public-key --region ${region} --availability-zone ${master-zone} --instance-id ${master-id} --instance-os-user ubuntu --ssh-public-key file:///home/ubuntu/kube_key.pub && ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /home/ubuntu/kube_key ubuntu@${master-private} 'until [ "$(kubectl get node | awk '\''/kube-master/ {print $2}'\'')" == "Ready" ]; do sleep 3; done'
 aws ec2-instance-connect send-ssh-public-key --region ${region} --availability-zone ${master-zone} --instance-id ${master-id} --instance-os-user ubuntu --ssh-public-key file:///home/ubuntu/kube_key.pub \
 && eval "$(ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  \

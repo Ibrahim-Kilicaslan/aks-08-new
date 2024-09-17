@@ -202,7 +202,7 @@ Resources:
             ./aws/install
             aws ec2 wait instance-status-ok --instance-ids ${KubeMaster1}
             ssh-keygen -t rsa -f /home/ubuntu/kube_key -q -N ""
-            sleep 1
+            sleep 60
             aws ec2-instance-connect send-ssh-public-key --region ${AWS::Region} --availability-zone $(aws ec2 describe-instances --instance-ids ${KubeMaster1} --query 'Reservations[0].Instances[0].Placement.AvailabilityZone' --output text) --instance-id ${KubeMaster1} --instance-os-user ubuntu --ssh-public-key file:///home/ubuntu/kube_key.pub \
             && eval "$(ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no  \
             -i /home/ubuntu/kube_key ubuntu@$(aws ec2 describe-instances --instance-ids ${KubeMaster1} --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text) kubeadm token create --print-join-command)"

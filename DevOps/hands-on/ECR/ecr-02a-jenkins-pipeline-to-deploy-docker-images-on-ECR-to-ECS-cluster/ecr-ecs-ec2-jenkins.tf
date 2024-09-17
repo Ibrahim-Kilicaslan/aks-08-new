@@ -60,7 +60,7 @@ resource "aws_security_group" "ec2-sec-gr" {
 
 resource "aws_iam_role" "roleforjenkins" {
   name                = "ecr_jenkins_permission_${local.user}"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess", "arn:aws:iam::aws:policy/AdministratorAccess", "arn:aws:iam::aws:policy/AmazonECS_FullAccess"]
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess", "arn:aws:iam::aws:policy/AmazonECS_FullAccess"]
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -137,9 +137,6 @@ resource "aws_instance" "jenkins-server" {
           #add ec2-user and jenkins users to docker group
           usermod -a -G docker ec2-user
           usermod -a -G docker jenkins
-          # configure docker as cloud agent for jenkins
-          cp /lib/systemd/system/docker.service /lib/systemd/system/docker.service.bak
-          sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 -H unix:\/\/\/var\/run\/docker.sock/g' /lib/systemd/system/docker.service
           systemctl daemon-reload
           systemctl restart docker
           systemctl restart jenkins

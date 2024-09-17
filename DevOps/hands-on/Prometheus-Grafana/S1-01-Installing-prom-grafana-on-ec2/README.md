@@ -20,6 +20,8 @@ At the end of this hands-on training, students will be able to;
 
 - Part 4 - Creating a monitoring dashboard with Grafana 
 
+- Part 5 - Add prometheus rules 
+
 ## Part 1 - Learn install, configure, and use a simple Prometheus instance
 
 - Launch an Amazon EC2 instance with setting seen below: 
@@ -33,7 +35,7 @@ Securtiy Group: "Port 22, 3000, 9090, 9100"
 - [Download the latest release](https://prometheus.io/download/) of Prometheus for linux. Select *.linux-*.tar.gz
 
 ```bash
-wget https://github.com/prometheus/prometheus/releases/download/v2.52.0/prometheus-2.52.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/prometheus/releases/download/v2.54.1/prometheus-2.54.1.linux-amd64.tar.gz
 ```
 
 Extract and run it.
@@ -131,7 +133,7 @@ For more about the expression language, see the [expression language documentati
 - Install and run the Prometheus Node Exporter that is a single static binary. Once you've downloaded it from the Prometheus downloads page extract it, and run it:
 
 ```bash
-wget https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v1.8.2/node_exporter-1.8.2.linux-amd64.tar.gz
 tar xvfz node_exporter-*.*-amd64.tar.gz
 cd node_exporter-*.*-amd64
 ./node_exporter
@@ -209,7 +211,7 @@ scrape_configs:
 - Select `Red Hat, CentOS, RHEL, and Fedora(64 Bit)` part.
 
 ```bash
-sudo yum install -y https://dl.grafana.com/enterprise/release/grafana-enterprise-11.0.0-1.x86_64.rpm
+sudo yum install -y https://dl.grafana.com/enterprise/release/grafana-enterprise-11.2.0-1.x86_64.rpm
 sudo systemctl start grafana-server.service
 ```
 
@@ -254,6 +256,98 @@ sudo systemctl start grafana-server.service
   - Paste the `id of the dashboard` (eg. 12486) to `Import via grafana.com` part and click `load`.
 
 - Monitor the dashboard.
+
+## Part 5 - Add prometheus rules
+
+- Create a `first_rules.yml` in the prometheus `prometheus-*-amd64/` folder as below.
+
+```yaml
+groups:
+  - name: server_is_down
+    rules:
+    - alert: server_down
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: critic
+      annotations:
+        summary:  server is down.
+
+  - name: example
+    rules:
+    - record: code:prometheus_http_requests_total:sum
+      expr: sum by (code) (prometheus_http_requests_total)
+
+  - name: high cpu
+    rules:
+    - alert: HostHighCpuLoad
+      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 50
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Host high CPU load (instance {{ $labels.instance }})
+        description: CPU load is > 50%\n  VALUE = {{ $value }}
+```
+
+- Update `prometheus.yml` file to enable the `first_rules.yml` file as below.
+
+```yaml
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "first_rules.yml"   # Uncomment this part
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # configs for scraping node exporter metrics
+  - job_name: node
+    static_configs:
+      - targets: ['localhost:9100']
+```
+
+- Stop and run prometheus again.
+
+```bash
+./prometheus --config.file=./prometheus.yml
+```
+
+- To test `server_is_down` rule, stop the `node-exporter`, and check prometheus alerts.
+
+- Start the `node-exporter` again.
+
+- To test `high cpu` rule, execute the following command.
+
+```bash
+while true ; do let i=i*i ; done
+```
+
+- This gives high cpu usage the node.
+
+- After see `high cpu` alarm,terminate the `while true ; do let i=i*i ; done` command.
 
 # Resources:
 

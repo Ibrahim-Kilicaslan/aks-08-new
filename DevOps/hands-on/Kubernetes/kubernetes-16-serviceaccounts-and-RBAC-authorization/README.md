@@ -202,6 +202,7 @@ roleRef:
 ```bash
 kubectl run mypod --image=clarusway/kubectl
 kubectl exec -it mypod -- sh
+/ # kubectl auth whoami
 / # kubectl get po
 Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:default:default" cannot list resource "pods" in API group "" in the namespace "default"
 / # exit
@@ -271,6 +272,7 @@ spec:
 ```bash
 kubectl apply -f kubepod.yaml
 kubectl exec -it kubepod -- sh
+/ # kubectl auth whoami
 / # kubectl get po
 Error from server (Forbidden): pods is forbidden: User "system:serviceaccount:default:default" cannot list resource "pods" in API group "" in the namespace "default"
 / # exit
