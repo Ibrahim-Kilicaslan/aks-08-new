@@ -1,5 +1,5 @@
 mykey = "petclinic"
-ami = "ami-08a0d1e16fc3f61ea"
+ami = "ami-0ebfd941bbafe70c6"
 region = "us-east-1"
 instance_type = "t3a.medium"
 jenkins_server_secgr = "petclinic-jenkins-server-secgr"

@@ -71,7 +71,7 @@ sudo dnf install docker -y
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -a -G docker ec2-user
-sudo curl -SL https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+sudo curl -SL https://github.com/docker/compose/releases/download/v2.29.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo dnf install git -y
 sudo dnf install java-11-amazon-corretto -y
@@ -243,7 +243,7 @@ git checkout feature/msp-6
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -257,7 +257,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -271,7 +271,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -285,7 +285,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -299,7 +299,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -313,7 +313,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -327,7 +327,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -341,7 +341,7 @@ ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
 
 ``` Dockerfile
 FROM openjdk:11-jre
-ARG DOCKERIZE_VERSION=v0.7.0
+ARG DOCKERIZE_VERSION=v0.8.0
 ENV SPRING_PROFILES_ACTIVE docker,mysql
 ADD https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-alpine-linux-amd64-${DOCKERIZE_VERSION}.tar.gz dockerize.tar.gz
 RUN tar -xzf dockerize.tar.gz
@@ -543,23 +543,10 @@ services:
     ports:
     - 3306:3306
 ```
-
-* Prepare a script to test the deployment of the app locally with `docker-compose-local.yml` and save it as `test-local-deployment.sh` under `petclinic-microservices-with-db` folder.
-
-``` bash
-docker-compose -f docker-compose-local.yml up
-```
-
-* Give execution permission to test-local-deployment.sh.
-
-```bash
-chmod +x test-local-deployment.sh
-```
-
 * Execute the docker compose.
 
 ```bash
-./test-local-deployment.sh
+docker-compose -f docker-compose-local.yml up
 ```
 
 * Commit the change, then push the docker compose file to the remote repo.
@@ -596,27 +583,24 @@ hostnamectl set-hostname jenkins-server
 # install git
 dnf install git -y
 # install java 11
-dnf install java-11-amazon-corretto -y
+dnf install fontconfig java-11-amazon-corretto -y
+
 # install jenkins
 wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
-rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
-dnf upgrade
-dnf install jenkins -y
-systemctl enable jenkins
-systemctl start jenkins
+rpm --import https://pkg.jenkins.io/redhat/jenkins.io-2023.key
+dnf upgrade -y
+dnf install jenkins-2.452.3-1.1 -y
+
 # install docker
 dnf install docker -y
 systemctl start docker
 systemctl enable docker
 usermod -a -G docker ec2-user
 usermod -a -G docker jenkins
-# configure docker as cloud agent for jenkins
-cp /lib/systemd/system/docker.service /lib/systemd/system/docker.service.bak
-sed -i 's/^ExecStart=.*/ExecStart=\/usr\/bin\/dockerd -H tcp:\/\/127.0.0.1:2376 -H unix:\/\/\/var\/run\/docker.sock/g' /lib/systemd/system/docker.service
-systemctl daemon-reload
-systemctl restart jenkins
+systemctl enable jenkins
+systemctl start jenkins
 # install docker compose
-curl -SL https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+curl -SL https://github.com/docker/compose/releases/download/v2.29.4/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 # install python 3
 dnf install -y python3-pip python3-devel
@@ -625,8 +609,9 @@ pip3 install ansible
 # install boto3
 pip3 install boto3 botocore
 # install terraform
-wget https://releases.hashicorp.com/terraform/1.8.0/terraform_1.8.0_linux_amd64.zip
-unzip terraform_1.8.0_linux_amd64.zip -d /usr/local/bin
+wget https://releases.hashicorp.com/terraform/1.9.6/terraform_1.9.6_linux_amd64.zip
+unzip terraform_1.9.6_linux_amd64.zip -d /usr/local/bin
+
 ```
 
 * Commit the change, then push the terraform files file to the remote repo.
@@ -1047,7 +1032,6 @@ git checkout feature/msp-14
       Command:
 ```
 ```bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-dev"
 AWS_REGION="us-east-1"
 
@@ -1065,7 +1049,6 @@ aws ecr create-repository \
 * Prepare a script to create Docker Registry for `dev` on AWS ECR and save it as `create-ecr-docker-registry-for-dev.sh` under `infrastructure` folder.
 
 ``` bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-dev"
 AWS_REGION="us-east-1"
 
@@ -1376,7 +1359,6 @@ git push --set-upstream origin feature/msp-16
 ```bash
 echo $PATH
 whoami
-PATH="$PATH:/usr/local/bin"
 python3 --version
 pip3 --version
 ansible --version
@@ -1391,7 +1373,6 @@ terraform --version
 - After running the job above, replace the script with the one below in order to test creating key pair for `ansible`. (Click `Configure`)
 
 ```bash
-PATH="$PATH:/usr/local/bin"
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
 AWS_REGION="us-east-1"
 aws ec2 create-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR} --query "KeyMaterial" --output text > ${ANS_KEYPAIR}
@@ -1404,7 +1385,6 @@ chmod 400 ${ANS_KEYPAIR}
 - After running the job above, replace the script with the one below in order to test creating kubernetes infrastructure with terraform. (Click `Configure`)
 
 ```bash
-PATH="$PATH:/usr/local/bin"
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
 AWS_REGION="us-east-1"
 cd infrastructure/dev-k8s-terraform
@@ -1451,7 +1431,6 @@ git push --set-upstream origin feature/msp-16
 - Configure `test-creating-qa-automation-infrastructure` job and replace the existing script with the one below in order to test ansible by pinging static hosts.
 
 ```bash
-PATH="$PATH:/usr/local/bin"
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
 export ANSIBLE_INVENTORY="${WORKSPACE}/ansible/inventory/hosts.ini"
 export ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
@@ -1492,7 +1471,6 @@ git push
 
 ```bash
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
-PATH="$PATH:/usr/local/bin"
 export ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
 export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-inventory -v -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml --graph
@@ -1506,7 +1484,6 @@ ansible-inventory -v -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.
 ```bash
 # Test dev dynamic inventory by pinging
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
-PATH="$PATH:/usr/local/bin"
 export ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
 export ANSIBLE_HOST_KEY_CHECKING=False
 ansible -i ./ansible/inventory/dev_stack_dynamic_inventory_aws_ec2.yaml all -m ping
@@ -1649,7 +1626,6 @@ git push
 
 ```bash
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
-PATH="$PATH:/usr/local/bin"
 export ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
 export ANSIBLE_HOST_KEY_CHECKING=False
 # k8s setup
@@ -1672,7 +1648,6 @@ terraform destroy -auto-approve -no-color
 - After running the job above, replace the script with the one below in order to test deleting existing key pair using AWS CLI with following script. (Click `Configure`)
 
 ```bash
-PATH="$PATH:/usr/local/bin"
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
 AWS_REGION="us-east-1"
 aws ec2 delete-key-pair --region ${AWS_REGION} --key-name ${ANS_KEYPAIR}
@@ -1686,7 +1661,6 @@ rm -rf ${ANS_KEYPAIR}
 
 ```bash
 # Environment variables
-PATH="$PATH:/usr/local/bin"
 ANS_KEYPAIR="petclinic-ansible-test-dev.key"
 AWS_REGION="us-east-1"
 export ANSIBLE_PRIVATE_KEY_FILE="${WORKSPACE}/${ANS_KEYPAIR}"
@@ -1921,7 +1895,6 @@ helm plugin install https://github.com/hypnoglow/helm-s3.git
 
 ``` bash
 sudo su -s /bin/bash jenkins
-export PATH=$PATH:/usr/local/bin
 helm version
 helm plugin install https://github.com/hypnoglow/helm-s3.git
 exit
@@ -2130,7 +2103,6 @@ git push --set-upstream origin feature/msp-18
       Command:
 ```
 ```bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-dev" # Write your own repo name
 AWS_REGION="us-east-1" #Update this line if you work on another region
 ECR_REGISTRY="046402772087.dkr.ecr.us-east-1.amazonaws.com" # Replace this line with your ECR name
@@ -2217,13 +2189,6 @@ driver.close()
     with_items: "{{ output.results }}"
 ```
 
-- Prepare a script to run the playbook for dummy selenium job on Jenkins Server (localhost) and save it as `run_dummy_selenium_job.sh` under `ansible/scripts` folder.
-
-```bash
-PATH="$PATH:/usr/local/bin"
-ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspace=${WORKSPACE}" ./ansible/playbooks/pb_run_dummy_selenium_job.yaml
-```
-
 - Run the following command to test the `dummy_selenium_test_headless.py` file.
 
 ```bash
@@ -2239,23 +2204,6 @@ ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspa
 git add .
 git commit -m 'added scripts for running dummy selenium job'
 git push --set-upstream origin feature/msp-18
-```
-
-- Create a Jenkins job with name of `test-running-dummy-selenium-job` to check the setup for selenium tests by running dummy selenium job on `feature/msp-18` branch.
-
-```yml
-- job name: test-running-dummy-selenium-job
-- job type: Freestyle project
-- Source Code Management: Git
-      Repository URL: https://github.com/[your-github-account]/petclinic-microservices.git
-- Branches to build:
-      Branch Specifier (blank for 'any'): */feature/msp-18
-- Build:
-      Add build step: Execute Shell
-      Command:
-```
-```bash
-ansible-playbook --connection=local --inventory 127.0.0.1, --extra-vars "workspace=$(pwd)" ./ansible/playbooks/pb_run_dummy_selenium_job.yaml
 ```
 
 - Create Ansible playbook for running all selenium jobs under `selenium-jobs` folder and save it as `pb_run_selenium_jobs.yaml` under `ansible/playbooks` folder.
@@ -2283,7 +2231,6 @@ url = "http://"+APP_IP.strip()+":30001/"
 - Prepare a script to run the playbook for all selenium jobs on Jenkins Server (localhost) and save it as `run_selenium_jobs.sh` under `ansible/scripts` folder.
 
 ```bash
-PATH="$PATH:/usr/local/bin"
 ansible-playbook -vvv --connection=local --inventory 127.0.0.1, --extra-vars "workspace=${WORKSPACE} master_public_ip=${MASTER_PUBLIC_IP}" ./ansible/playbooks/pb_run_selenium_jobs.yaml
 ```
 
@@ -2371,8 +2318,9 @@ pipeline {
         stage('Create QA Automation Infrastructure') {
             steps {
                 echo 'Creating QA Automation Infrastructure for Dev Environment'
+                //Change `clarus` statement in the `infrastructure/dev-k8s-terraform/main.tf` file with `$ANS_KEYPAIR` statement
                 sh """
-                    cd infrastructure/dev-k8s-terraform
+                    cd infrastructure/dev-k8s-terraform  
                     sed -i "s/clarus/$ANS_KEYPAIR/g" main.tf
                     terraform init
                     terraform apply -auto-approve -no-color
@@ -2380,6 +2328,7 @@ pipeline {
                 script {
                     echo "Kubernetes Master is not UP and running yet."
                     env.id = sh(script: 'aws ec2 describe-instances --filters Name=tag-value,Values=master Name=tag-value,Values=tera-kube-ans Name=instance-state-name,Values=running --query Reservations[*].Instances[*].[InstanceId] --output text',  returnStdout:true).trim()
+                    //This command waits for masternode is ready. It blocks the terminal until the status check of master node is okay.
                     sh 'aws ec2 wait instance-status-ok --instance-ids $id'
                 }
             }
@@ -2566,6 +2515,7 @@ kubectl version --client
 - Switch user to jenkins for creating eks cluster. Execute following commands as `jenkins` user.
 
 ```bash
+sudo usermod -s /bin/bash jenkins
 sudo su - jenkins
 ```
 
@@ -2599,8 +2549,7 @@ eksctl create cluster -f cluster.yaml
 - After the cluster is up, run the following command to install `ingress controller`.
 
 ```bash
-export PATH=$PATH:$HOME/bin
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.2/deploy/static/provider/aws/deploy.yaml
 ```
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -2625,7 +2574,6 @@ git checkout feature/msp-20
       Command:
 ```
 ```bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-qa"
 AWS_REGION="us-east-1"
 
@@ -3151,7 +3099,7 @@ From ACM            : *.clarusway.us   # change with your dns name
 * Install RKE, the Rancher Kubernetes Engine, [Kubernetes distribution and command-line tool](https://rancher.com/docs/rke/latest/en/installation/)) on Jenkins Server.
 
 ```bash
-curl -SsL "https://github.com/rancher/rke/releases/download/v1.5.10/rke_linux-amd64" -o "rke_linux-amd64"
+curl -SsL "https://github.com/rancher/rke/releases/download/v1.5.0/rke_linux-amd64" -o "rke_linux-amd64"
 sudo mv rke_linux-amd64 /usr/local/bin/rke
 chmod +x /usr/local/bin/rke
 rke --version
@@ -3235,9 +3183,9 @@ kubectl create namespace cattle-system
 * Install Rancher on RKE Kubernetes Cluster using Helm.
 
 ```bash
-helm install rancher rancher-stable/rancher \
+helm install rancher rancher-stable/rancher --version 2.8.1 \
   --namespace cattle-system \
-  --set hostname=rancher.clarusway.us \
+  --set hostname=rancherj.clarusway.us \
   --set tls=external \
   --set replicas=1 \
   --set global.cattle.psp.enabled=false
@@ -3486,7 +3434,6 @@ Worker            : checked
       Command:
 ```
 ``` bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-staging"
 AWS_REGION="us-east-1"
 
@@ -3764,7 +3711,6 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
       Command:
 ```
 ``` bash
-PATH="$PATH:/usr/local/bin"
 APP_REPO_NAME="clarusway-repo/petclinic-app-prod"
 AWS_REGION="us-east-1"
 

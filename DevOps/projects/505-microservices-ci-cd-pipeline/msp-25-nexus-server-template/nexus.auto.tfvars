@@ -1,5 +1,5 @@
 mykey = "clarusway"
-ami = "ami-06c68f701d8090592"
+ami = "ami-0ebfd941bbafe70c6"
 region = "us-east-1"
 instance_type = "t3a.medium"
 nexus_server_secgr = "petclinic-nexus-server-secgr"
