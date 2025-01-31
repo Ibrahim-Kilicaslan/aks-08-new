@@ -1,4 +1,4 @@
-# Hands-on Kubernetes-01 : Installing Kubernetes on Ubuntu running on AWS EC2 Instances
+ # Hands-on Kubernetes-01 : Installing Kubernetes on Ubuntu running on AWS EC2 Instances
 
 Purpose of the this hands-on training is to give students the knowledge of how to install and configure Kubernetes on Ubuntu EC2 Instances.
 
@@ -416,6 +416,7 @@ kubectl get pods -o wide
 ```
 
 - Expose the nginx-server pod as a new Kubernetes service on master.
+# --type=NodePort
 
 ```bash
 kubectl expose pod nginx-server --port=80 --type=NodePort
