@@ -416,7 +416,7 @@ kubectl get pods -o wide
 ```
 
 - Expose the nginx-server pod as a new Kubernetes service on master.
-# --type=NodePort
+
 
 ```bash
 kubectl expose pod nginx-server --port=80 --type=NodePort
