@@ -539,6 +539,7 @@ metadata:
 ...
 ...
 ```
+- edit komutu sertifika sinvlarinda ise yariyor. ornegin konteynir imajini degistirmek icin
 
 - Show the rollout history.
 
