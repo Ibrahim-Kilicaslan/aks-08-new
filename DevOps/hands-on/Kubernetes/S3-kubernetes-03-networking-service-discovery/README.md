@@ -121,11 +121,15 @@ spec:
         - containerPort: 5000
 ```
 
-- Create the web-flask Deployment.
+- Create the web-flask Deployment. 
   
 ```bash
 kubectl apply -f web-flask.yaml
 ```
+  <!-- kubectl create deployment mydeploy --image=nginx 
+  kubectl get deployment mydeploy -o yaml
+  kubectl get deployment mydeploy -o yaml > mydeploy
+  kubectl get deploy -->
 
 - Show the Pods detailed information and learn their IP addresses:
 
@@ -148,7 +152,7 @@ We now check we can ping a Pod inside the cluster.
 
 - Create a `forcurl.yaml` file to create a Pod that pings a Pod inside the cluster.
 
-```yaml
+```yaml 
 apiVersion: v1
 kind: Pod
 metadata:

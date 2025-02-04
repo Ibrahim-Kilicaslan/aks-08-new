@@ -118,6 +118,12 @@ spec:
 ```bash
 kubectl apply -f clarus-pv-claim.yaml
 ```
+<!-- PersistentVolumeClaim ile PersistentVolume birbirini tutmasi icin 
+storageClassName: manual
+accessModes:
+    - ReadWriteOnce
+storage: 5Gi
+ tutmasi gerekli . kolay olsun diye storageClassName: manual olarak yazilir. yada selector ile type'ini belirtmek gerekli. bu sekilde claim gidip volume'u bulsun. -->
 
 > After we create the PersistentVolumeClaim, the Kubernetes control plane looks for a PersistentVolume that satisfies the claim's requirements. If the control plane finds a suitable `PersistentVolume` with the same `StorageClass`, it binds the claim to the volume. Look for details at [Persistent Volumes and Claims](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#introduction)
 
@@ -217,7 +223,7 @@ kubectl delete pod clarus-pod
 kubectl delete pvc clarus-pv-claim
 kubectl delete pv clarus-pv-vol
 ```
-
+<!-- kubectl delete -f . >> bu sekilde siler ama komut ile olusturulan svc'yi kubectl delete svc clarus-pod olarak silmemiz gerekli. -->
 ## Part 3 - Binding PV to PVC
 
 - Create a folder and name it "pvc-bound".
