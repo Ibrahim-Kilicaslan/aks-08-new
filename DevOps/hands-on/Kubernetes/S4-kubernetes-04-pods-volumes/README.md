@@ -451,13 +451,14 @@ kubectl delete pod nginx-pod
 ```bash
 kubectl get sc
 
-kubectl describe sc local-path
+kubectl describe sc local-path 
 ```
 
 - Create a folder and name it storageclass.
 
 ```bash
 mkdir storageclass && cd storageclass
+# mkdir storageclass && cd storageclass && touch sc-pv-claim.yaml pod-with-dynamic-storage.yaml  >> bu sekilde de yaml dosyalarini acabiliriz.
 ```
 
 - Create a persistentvolumeclaim with the following settings.

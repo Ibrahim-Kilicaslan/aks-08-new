@@ -43,7 +43,7 @@ kubectl get no
 - Secrets can contain user credentials required by Pods to access a database. For example, a database connection string consists of a username and password. You can store the username in a file ./username.txt and the password in a file ./password.txt on your local machine.
 
 ```bash
-# Create files needed for the rest of the example.
+# Create files needed for the rest of the example.  >> -n yazilinca new line olusturmuyor, hatayi ortadan kaldiriyor.
 echo -n 'admin' > ./username.txt
 echo -n '1f2d1e2e67df' > ./password.txt
 ```
@@ -79,10 +79,11 @@ kubectl create secret generic db-user-pass-key --from-file=username=./username.t
 ```bash
 kubectl get secrets
 ```
+<!-- kubectl get secret dev-db-secret -o yaml  >> username ve password daha detayli gorebiliriz-->
 
 - The output is similar to:
 
-```bash
+```bash  
 NAME                  TYPE                                  DATA      AGE
 db-user-pass          Opaque                                2         51s
 ```
