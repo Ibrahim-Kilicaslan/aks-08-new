@@ -728,7 +728,13 @@ spec:
           - key: content
             path: index.html
 ```
-
+<!-- konteynirin altinda volume olustur, 
+default konteynirin path'ni yaz
+volume bagla
+daha sonra volume kisminda volume'u olustur
+bu volume bilgileri hangi configmap'ten alsin, ismini gir
+hangi bilgiyi alsin (content)
+ nereye kaydetsin, path'ini belirle (index.yaml),  -->
 - Volume and volume mounting are common ways to place config files inside a container. We are selecting `content` key from `nginx-config` ConfigMap and put it inside the container at path `/usr/share/nginx/html/` with the name `index.html`.
 
 - Apply and run all the configurations as follow:
