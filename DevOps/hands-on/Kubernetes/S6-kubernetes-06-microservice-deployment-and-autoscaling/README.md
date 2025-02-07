@@ -619,6 +619,7 @@ NAME     CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 master   188m         9%     1245Mi          32%
 node1    108m         5%     1035Mi          27% 
 ```
+<!--  kubectl top nodes >> ne kadar cpu tukettigini gosteriyor. -->
 
 ```bash
 $ kubectl get hpa
