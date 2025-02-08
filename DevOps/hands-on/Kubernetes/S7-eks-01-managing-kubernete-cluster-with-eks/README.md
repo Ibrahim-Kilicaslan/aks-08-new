@@ -426,3 +426,10 @@ kubectl get nodes
 ```
 
 12. Atfer clean-up `worker nodes` and `cluster`, delete the `LoadBalancer` manually.
+
+
+<!-- 
+kubectl config --help  >> available commands'lari gisteriyor.
+kubectl config current-context  >> hangi cluster da oldugunu gosterir
+kubectl config use-context ibrahim-cluster >> cluster'lar arasi gecis yapma
+ -->
