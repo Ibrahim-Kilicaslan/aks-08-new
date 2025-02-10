@@ -255,7 +255,8 @@ kubectl apply -f .
 
 - https://kubernetes.io/docs/concepts/services-networking/ingress/
     
-- Open the offical [ingress-nginx]( https://kubernetes.github.io/ingress-nginx/deploy/ ) explain the `ingress-controller` installation steps for different architecture. We install ingress for bare metal.
+- Open the offical [ingress-nginx]( https://kubernetes.github.io/ingress-nginx/deploy/ ) explain the `ingress-controller` installation steps for different architecture. We install ingress for bare metal. 
+<!-- ingres'in calisabilmesi icin ingress controller kurulmasi gerekli -->
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/aws/deploy.yaml
@@ -419,6 +420,7 @@ kubectl run mynginx --image=nginx --port=80 --expose
 kubectl run myapache --image=httpd --port=80 --expose
 kubectl get po,svc
 ```
+<!-- --expose yazinca arka planda servisi otomatik olarak ayarliyor.yani ayrica srvis hazirlamak zorunda kalmiyorsun -->
 
 - Create ingress file named `mying.yaml` and use name based virtual hosting.
 
@@ -482,6 +484,7 @@ kubectl get ingress
 NAME        CLASS   HOSTS                                    ADDRESS                                                                         PORTS   AGE
 myingress   nginx   nginx.clarusway.us,apache.clarusway.us   afdfe2adcb6934b4abb645258b8f73d2-501976fbe439549f.elb.us-east-1.amazonaws.com   80      6s
 ```
+<!-- ingress yaptigimizdan dolayi dnsname ile goremiyoruz, ama hostname'i route53'e tanimlamamiz gerekiyor. -->
 
 - To reach the application with `host` name, create `nginx.clarusway.us,apache.clarusway.us` records for address (network load balancer) in `route53` service.
 
